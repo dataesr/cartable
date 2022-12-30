@@ -1,0 +1,70 @@
+
+.stick {
+  position: sticky;
+  top: 0;
+  background: var(--background-default-grey);
+  z-index: 100;
+  margin: 0;
+  margin-top: 0px;
+  margin-left: 0px;
+  margin-top: .25rem;
+}
+
+.stick + * {
+  margin-bottom: 1.5rem;
+}
+
+.ctbl-line {
+  border-bottom: 1px solid var(--background-contrast-raised-grey);
+  .ctbl-line__item {
+    
+    &:hover {
+        background-color: var(--background-contrast-raised-grey);
+      }
+  }
+}
+
+.ctbl-permission-bloc {
+  border: 2px solid var(--border-action-high-blue-france);
+  border-radius: 1rem;
+}
+
+
+@keyframes settings-mount {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.ctbl-folder-settings-visible {
+  visibility: visible;
+  animation: settings-mount 0.5s;
+}
+
+.ctbl-folder-hidden {
+  display: none;
+}
+
+// TODO: upload design
+// .fr-upload-group {
+//   position: relative;
+// }
+// .fr-upload-group::after {
+//   position: absolute;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   left: 0;
+//   right: 0;
+//   top: 4rem;
+//   font-family: remixicon;
+//   font-size: 3rem;
+//   line-height: 5rem;
+//   border-radius: .5rem;
+//   border: 4px dashed var(--background-contrast-raised-grey);
+//   content: "\f24c";
+// }

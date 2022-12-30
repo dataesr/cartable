@@ -1,0 +1,68 @@
+services:
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio:/data
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: administrator
+    command: server --console-address ":9001" /data
+    networks:
+      - cartable
+
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - 27017:27017
+    restart: always
+    command: --replSet rs0 --logpath /dev/null --quiet
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - mongo:/data/db
+    networks:
+      - cartable
+
+  express:
+    build:
+      context: server
+      dockerfile: Dockerfile
+    command: npm run start:dev
+    restart: always
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server/src:/app/src
+    ports:
+      - 4000:4000
+    depends_on:
+      mongodb:
+        condition: service_started
+    networks:
+      - cartable
+
+  react:
+    build:
+      context: client
+      dockerfile: Dockerfile
+    command: npm run dev:docker
+    restart: always
+    volumes:
+      - ./client/src:/app/src
+    # environment:
+    #   - VITE_APP_API_URL=http://express:4000/api
+    ports:
+      - 5173:5173
+    networks:
+      - cartable
+
+networks:
+  cartable: {}
+
+volumes:
+  mongo:
+  minio:

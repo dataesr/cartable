@@ -1,0 +1,9 @@
+.fullwidth {
+  width: 100%;
+  border-bottom: 1px solid grey;
+}
+.hoverable {
+  &:hover {
+    background-color: antiquewhite;
+  }
+}

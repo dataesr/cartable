@@ -1,0 +1,987 @@
+openapi: 3.0.1
+info:
+  title: API
+  description: Documentation for the Cartable REST API routes.
+  contact:
+    email: frederic.olland@enseignementsup.gouv.fr
+  license:
+    name: MIT
+    url: 'https://github.com/dataesr/cartable/LICENCE'
+  version: 1.0.0
+servers:
+  - url: 'https://cartable.staging.dataesr.ovh/api'
+    description: Staging server
+  - url: 'https://cartable.dataesr.ovh/api'
+    description: Production server
+  - url: 'http://localhost:4000/api'
+    description: Development server
+
+tags:
+  - name: Authentication
+
+security:
+  - BearerAuth: []
+
+paths:
+  # ### FICHIERS ###
+  # '/files':
+  #   $ref: ./paths/files/files.yml
+
+  # ### AUTHENTICATION ###
+  # '/signup':
+  #   $ref: ./paths/auth/signup.yml
+
+  '/signin':
+    post:
+      tags:
+        - Authentication
+      summary: Sign a user in with credentials.
+      description: |
+        If 2FA is enabled:
+         - Not passing X-Cartable-OTP returns 202. It triggers a new email with OTP if user preference is email OTP.
+         - You may set X-Cartable-OTP-Method to change otp method.
+      security: []
+      operationId: signin
+      parameters:
+        - $ref: '#/components/parameters/XOtp'
+        - $ref: '#/components/parameters/XOtpMethod'
+      requestBody:
+        description: Required user credentials for signing in.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignInPayload'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+        202:
+          description: An email with an OTP has been sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+
+  '/signout':
+    post:
+      tags:
+        - Authentication
+      summary: Sign a user out
+      description: Removes user's refreshToken
+      operationId: signout
+      responses:
+        204:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/token':
+    post:
+      tags:
+        - Authentication
+      summary: |
+        Allows to generate a new pair of access and refresh token by providing a valid refresh token.
+        A new pair of token means a new refresh token whose expiration date is reseted with the configurated validity period.
+        The current validity period of a refresh token is 20 days.
+      security: []
+      operationId: refreshToken
+      requestBody:
+        description: A valid refresh token
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+    
+  '/passwordless':
+    post:
+      tags:
+        - Authentication
+      summary: Recover a lost/forgotten/unset password.
+      description: |
+        Not passing X-Paysage-OTP returns 202 and triggers a new email with an OTP for the user to allow passord change.
+      security: []
+      operationId: passwordless
+      parameters:
+        - $ref: '#/components/parameters/XOtp'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                  pattern: '^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&:_])[A-Za-z\d@$!%*#?&:_]{8,}$'
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        202:
+          description: An email with an OTP has been sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+
+  ### USERS ###
+  '/users':
+    get:
+      tags:
+        - Users
+      summary: List users
+      operationId: listUsers
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/User'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags:
+        - Users
+      summary: Invite new user
+      operationId: inviteUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/users/{id}':
+    delete:
+      tags:
+        - Users
+      summary: Delete a user by id
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid
+      responses:
+        204:
+          description: No content
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags:
+        - Users
+      summary: Invite new user
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum:
+                    - admin
+                    - user
+      responses:
+        204:
+          description: No content
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/folders':
+    get:
+      tags:
+        - Folders
+      summary: List folders
+      operationId: listFolders
+      security: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Folder'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags:
+        - Folders
+      summary: Create a new folder
+      operationId: createFolder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                access:
+                  type: string
+                  default: private
+                  enum:
+                    - private
+                    - public
+                isArchived:
+                  type: boolean
+                  default: false
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/folders/{id}':
+    patch:
+      tags:
+        - Folders
+      summary: Update a folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                access:
+                  type: string
+                  enum:
+                    - private
+                    - public
+                isArchived:
+                  type: boolean
+              
+      responses:
+        204:
+          description: No content
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/folders/{id}/star':
+    put:
+      tags:
+        - Folders
+      summary: Star a folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid          
+      responses:
+        204:
+          description: No content
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Folders
+      summary: Unstar a folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid          
+      responses:
+        204:
+          description: No content
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/folders/{id}/files':
+    post:
+      tags:
+        - Files
+      summary: Save sigle or multiple files
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              title: FilePayLoad
+              type: object
+              properties:
+                files:
+                  type: string
+                  format: binary
+              
+      responses:
+        201:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/folders/{id}/permissions':
+    get:
+      tags:
+        - Folders
+      summary: Get folder permissions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid              
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - Folders
+      summary: Add user's permission for specified folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: PermissionPayLoad
+              type: object
+              properties:
+                role:
+                  type: string
+                  default: viewer 
+                userId:
+                  type: string
+                  format: mongo-objectid
+                    
+      responses:
+        204:
+          description: No content
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/folders/{folderId}/permissions/{userId}':
+    delete:
+      tags:
+        - Permissions
+      summary: Delete user's permission for specified folder
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: mongo-objectid
+      responses:
+        204:
+          description: No content
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/folders/{id}/files/{filename}':
+    get:
+      tags:
+        - Files
+      summary: Get a file
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string              
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Files
+      summary: Delete a file
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string              
+      responses:
+        204:
+          description: No content
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/me':
+    get:
+      tags:
+        - Users
+      summary: Get current user data
+      operationId: getMe
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags:
+        - Users
+      summary: Update current user data
+      operationId: patchMe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+  '/me/password':
+    put:
+      tags:
+        - Users
+      summary: Change user password
+      operationId: changeMyPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+                - currentPassword
+              properties:
+                newPassword:
+                  type: string
+                  pattern: '^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&:_])[A-Za-z\d@$!%*#?&:_]{8,}$'
+                currentPassword:
+                  type: string
+                  pattern: '^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&:_])[A-Za-z\d@$!%*#?&:_]{8,}$'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      schema:
+        type: string
+      required: true
+    XOtp:
+      name: X-Cartable-OTP
+      in: header
+      description: Use X-Cartable-OTP header to provide user's OTP
+      schema:
+        type: string
+        pattern: '^[0-9]{6}$'
+    XOtpMethod:
+      name: X-Cartable-OTP-Method
+      in: header
+      description: |
+        Use X-Cartable-OTP-Method header to request a new code.
+        Currently available method: email.
+      schema:
+        type: string
+        enum:
+          - 'email'
+          - 'authenticator'
+          - 'recovery'
+
+  responses:
+    BadRequest:
+      description: Illegal input for operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Permission denied.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServerError:
+      description: Server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication needed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+              path:
+                type: string
+              errorCode:
+                type: string
+    
+    Me:
+      type: object
+      additionalProperties: false
+      required:
+        - _id
+        - email
+        - role
+      properties:
+        _id:
+          type: string
+          format: mongo-objectid
+          readOnly: true
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        role:
+          readOnly: true
+          type: string
+          enum:
+            - admin
+            - user
+        email:
+          readOnly: true
+          type: string
+        2fa:
+          type: boolean
+        2faPreferedMethod:
+          type: string
+          enum:
+            - email
+            - authenticator
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+
+    User:
+      type: object
+      additionalProperties: false
+      properties:
+        _id:
+          type: string
+          format: mongo-objectid
+          readOnly: true
+        status:
+          type: string
+          enum:
+            - active
+            - pending
+        firstName:
+          type: string
+          nullable: true
+          readOnly: true
+        lastName:
+          type: string
+          nullable: true
+          readOnly: true
+        role:
+          type: string
+          enum:
+            - admin
+            - user
+        email:
+          type: string
+          readOnly: true
+        2fa:
+          type: boolean
+          readOnly: true
+        2faPreferedMethod:
+          readOnly: true
+          type: string
+          nullable: true
+          enum:
+            - null
+            - email
+            - authenticator
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+
+    Folder:
+      type: object
+      additionalProperties: false
+      properties:
+        _id:
+          type: string
+          readOnly: true
+          format: mongo-objectid
+        name:
+          type: string
+        description:
+          type: string
+        isArchived:
+          type: boolean
+        access:
+          type: string
+          enum:
+            - private
+            - public
+        isStarred:
+          type: boolean
+        viewerRole:
+          type: string
+          nullable: true
+          enum:
+            - null
+            - admin
+            - editor
+            - viewer
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        createdBy:
+          type: string
+          format: mongo-objectid
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updatedBy:
+          type: string
+          format: mongo-objectid
+          readOnly: true
+
+    UserSignInPayload:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+      properties:
+        password:
+          type: string
+          pattern: '^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&:_])[A-Za-z\d@$!%*#?&:_]{8,}$'
+          example: Azertyui!87
+          description: Minimum eight characters, at least one letter, one number and one special character
+        email:
+          type: string
+
+    Tokens:
+      type: object
+      additionalProperties: false
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Authentication with a Bearer token.
