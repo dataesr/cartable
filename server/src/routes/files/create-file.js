@@ -1,6 +1,5 @@
-import logger from '../../services/logger.service';
 import Storage from '../../services/storage.service';
-import { BadRequestError, ServerError } from '../../errors';
+import { BadRequestError } from '../../errors';
 
 export default async function createFile(req, res) {
   const { id } = req.params;
@@ -8,6 +7,6 @@ export default async function createFile(req, res) {
   const promises = req.files.map(
     (file) => Storage.put(`${id}/${Buffer.from(file.originalname, 'latin1').toString('utf-8')}`, file.buffer, file.mimetype),
   );
-  await Promise.all(promises).catch((e) => { logger.error(e); throw new ServerError('Cannot upload files'); });
+  await Promise.all(promises);
   res.status(201).json({});
 }
