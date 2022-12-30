@@ -41,7 +41,7 @@ export function handleErrors(err, req, res, next) {
     });
   }
   if (err) {
-    logger.error(err, { path, method });
+    logger.error(err);
     return res.status(err.status || 500).json({
       message: 'Something went wrong', details: [],
     });
