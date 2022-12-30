@@ -5,7 +5,7 @@ import {
   ListObjectsV2Command,
   DeleteObjectCommand,
   // CreateBucketCommand,
-} from "@aws-sdk/client-s3"; 
+} from '@aws-sdk/client-s3';
 import config from '../config';
 
 const { bucket, ...configS3 } = config.s3;
