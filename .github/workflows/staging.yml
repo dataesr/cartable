@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: 18
       - run: cd client
+      - run: ls -a
       - run: npm ci
       - run: npm run build:staging
       - run: cd ..
