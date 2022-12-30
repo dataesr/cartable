@@ -7,8 +7,8 @@ on:
 
 env:
   # Must match k8s deployment name
-  DEPLOYMENT: ${{ github.repository }}
-  DEPLOYMENT_NAMESPACE: ${{ github.repository }}
+  DEPLOYMENT: cartable
+  DEPLOYMENT_NAMESPACE: cartable
   DEPLOYMENT_URL: https://cartable.staging.dataesr.ovh
   MM_NOTIFICATION_CHANNEL: 'cartable-bot'
 
