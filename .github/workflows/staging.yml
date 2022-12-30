@@ -29,6 +29,8 @@ jobs:
       - run: cd client
       - run: npm ci
       - run: npm run build:staging
+      - run: cd ..
+      - run: mv client/dist server
 
       - name: Build server
         run: docker build -f server/Dockerfile -t ${{ github.repository }}
