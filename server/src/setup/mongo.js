@@ -29,6 +29,10 @@ async function generateAdminUser() {
     otpSecret,
     password,
     role: 'admin',
+    status: 'active',
+    '2fa': false,
+    firstName: 'Administrateur',
+    lastName: 'Cartable',
   };
   try {
     await db.collection('users').insertOne(data);
