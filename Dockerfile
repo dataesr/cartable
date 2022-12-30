@@ -5,4 +5,4 @@ WORKDIR /app
 # COPY package-lock.json ./
 COPY server ./
 RUN npm ci --silent
-EXPOSE 3000
+EXPOSE 4000

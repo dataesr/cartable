@@ -20,7 +20,7 @@ const production = {
     },
   },
   logger: {
-    logLevel: 'error',
+    logLevel: 'info',
   },
 };
 
