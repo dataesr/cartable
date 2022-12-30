@@ -10,5 +10,6 @@
 
 # production
 yarn.lock
+dist
 
 docs/reference

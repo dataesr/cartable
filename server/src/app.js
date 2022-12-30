@@ -57,9 +57,9 @@ app.use(filesRoutes);
 app.use(permissionsRoutes);
 
 // SERVE REACT BUILD
-app.use(express.static(path.join(path.resolve(), 'public/build')));
+app.use(express.static(path.join(path.resolve(), 'dist')));
 app.get('*', (req, res) => {
-  res.sendFile(path.join(path.resolve(), 'public/build/index.html'));
+  res.sendFile(path.join(path.resolve(), 'dist/index.html'));
 });
 
 app.use(handleErrors);
