@@ -18,6 +18,7 @@ const production = {
       accessKeyId: process.env.S3_ACCESS_KEY,
       secretAccessKey: process.env.S3_SECRET_KEY,
     },
+    signatureVersion: 'v4',
   },
   logger: {
     logLevel: 'info',

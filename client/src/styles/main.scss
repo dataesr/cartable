@@ -68,3 +68,30 @@
 //   border: 4px dashed var(--background-contrast-raised-grey);
 //   content: "\f24c";
 // }
+
+.show-on-hover {
+  BUTTON {
+    visibility: hidden;
+  }
+  &:hover {
+    BUTTON {
+      visibility: visible;
+    }
+  }
+}
+
+.sort-title {
+  position: relative;
+  BUTTON {
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      background-color: transparent !important;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  }
+}

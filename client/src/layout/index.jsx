@@ -20,7 +20,7 @@ export default function Layout() {
       <SwitchTheme isOpen={isSwitchThemeOpen} setIsOpen={setIsSwitchThemeOpen} />
       <div role="alert" id="notice-container" />
       <Container as="main" role="main" fluid>
-        {isLoading && <Container spacing="py-10w"><PageSpinner size="96" /></Container>}
+        {isLoading && <Container spacing="py-10w"><PageSpinner size={96} /></Container>}
         {(!isLoading && (viewer.role === 'admin')) && (
           <UsersProvider>
             <FoldersProvider>

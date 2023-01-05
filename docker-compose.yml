@@ -53,8 +53,6 @@ services:
     restart: always
     volumes:
       - ./client/src:/app/src
-    # environment:
-    #   - VITE_APP_API_URL=http://express:4000/api
     ports:
       - 5173:5173
     networks:

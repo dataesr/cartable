@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import { Col, Container, Icon, Row, Text } from '@dataesr/react-dsfr';
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import classNames from 'classnames';
 import Button from '../../../components/button';
 import { Spinner } from '../../../components/spinner';
 import { useFolders } from '../../../contexts/FoldersContext';
@@ -56,6 +57,12 @@ function getFileIconFromExtension(fileName) {
   return mapping[type];
 }
 
+const sorters = {
+  name: (a, b) => a.name.localeCompare(b.name),
+  updatedAt: (a, b) => new Date(a.updatedAt) - new Date(b.updatedAt),
+  size: (a, b) => a.size - b.size,
+};
+
 export default function FileList({ data }) {
   const { id } = useParams();
   const folders = useFolders();
@@ -64,9 +71,36 @@ export default function FileList({ data }) {
   const [files, setFiles] = useState(data);
   const [isInAction, setisInAction] = useState();
 
-  const handleDownloadFile = (folder, name) => {
+  const reducer = (state, action) => {
+    switch (action.type) {
+    case 'name':
+      if (state.field === 'name') {
+        return { ...state, ascending: !state.ascending };
+      }
+      return { field: 'name', ascending: true, sorter: sorters.name };
+    case 'updatedAt':
+      if (state.field === 'updatedAt') {
+        return { ...state, ascending: !state.ascending };
+      }
+      return { field: 'updatedAt', ascending: true, sorter: sorters.updatedAt };
+    case 'size':
+      if (state.field === 'size') {
+        return { ...state, ascending: !state.ascending };
+      }
+      return { field: 'size', ascending: true, sorter: sorters.size };
+    default:
+      return state;
+    }
+  };
+
+  const [sort, setSort] = useReducer(reducer, { field: 'name', sorter: sorters.name, ascending: true });
+
+  const handleDownloadFile = async (folder, name) => {
     setisInAction(name);
-    return api.get(`/folders/${folder}/files/${name}`, { Accept: '*' })
+    const { location } = await api.get(`/folders/${folder}/files/${name}`, { Accept: '*' })
+      .then((response) => response.data);
+    return fetch(location)
+      .then((response) => { if (response.ok) { return response; } throw new Error(500); })
       .then(async (response) => new Blob([await response.blob()], { type: response.headers.get('content-type') }))
       .then((fileBlob) => {
         const link = document.createElement('a');
@@ -118,18 +152,66 @@ export default function FileList({ data }) {
       </Container>
     );
   }
+  const sortedFiles = sort.ascending ? files.sort(sort.sorter) : files.sort(sort.sorter).reverse();
   return (
     <Container fluid>
       <Row alignItems="middle">
         <Col n="12" className="ctbl-line fr-py-1v fr-px-1w">
           <Row alignItems="middle">
-            <Col n="6"><Text size="sm" className="fr-mb-0" bold>Nom</Text></Col>
-            <Col n="2"><Row justifyContent="right"><Text className="fr-mb-0" size="sm" bold>Dernière modification</Text></Row></Col>
-            <Col n="2"><Row justifyContent="right"><Text size="sm" className="fr-mb-0" bold>Taille</Text></Row></Col>
+            <Col n="6">
+              <Row
+                className={classNames('sort-title', { 'show-on-hover': (sort.field !== 'name') })}
+                alignItems="middle"
+              >
+                <Text className="fr-mb-0" size="sm" bold>Nom</Text>
+                <Button
+                  tertiary
+                  borderless
+                  rounded
+                  size="sm"
+                  icon={`ri-arrow-${(sort.field === 'name' && !sort.ascending) ? 'up' : 'down'}-fill`}
+                  onClick={() => setSort({ type: 'name' })}
+                />
+              </Row>
+            </Col>
+            <Col n="2">
+              <Row
+                className={classNames('sort-title', { 'show-on-hover': (sort.field !== 'updatedAt') })}
+                justifyContent="right"
+                alignItems="middle"
+              >
+                <Button
+                  tertiary
+                  borderless
+                  rounded
+                  size="sm"
+                  icon={`ri-arrow-${(sort.field === 'updatedAt' && !sort.ascending) ? 'up' : 'down'}-fill`}
+                  onClick={() => setSort({ type: 'updatedAt' })}
+                />
+                <Text className="fr-mb-0" size="sm" bold>Dernière modification</Text>
+              </Row>
+            </Col>
+            <Col n="2">
+              <Row
+                className={classNames('sort-title', { 'show-on-hover': (sort.field !== 'size') })}
+                justifyContent="right"
+                alignItems="middle"
+              >
+                <Button
+                  tertiary
+                  borderless
+                  rounded
+                  size="sm"
+                  icon={`ri-arrow-${(sort.field === 'size' && !sort.ascending) ? 'up' : 'down'}-fill`}
+                  onClick={() => setSort({ type: 'size' })}
+                />
+                <Text size="sm" className="fr-mb-0" bold>Taille</Text>
+              </Row>
+            </Col>
             <Col n="2" />
           </Row>
         </Col>
-        {files.map((file) => (
+        {sortedFiles.map((file) => (
           <Col n="12" key={file.name} className="ctbl-line ctbl-line__item fr-py-1w fr-px-1w">
             <Row alignItems="middle">
               <Col n="6">

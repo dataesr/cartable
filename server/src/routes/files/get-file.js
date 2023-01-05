@@ -2,8 +2,9 @@ import Storage from '../../services/storage.service';
 
 export default async function getFile(req, res) {
   const { id, fileName } = req.params;
-  const file = await Storage.get(`${id}/${fileName}`);
-  res.setHeader('content-type', file.ContentType);
-  res.setHeader('content-length', file.ContentLength);
-  file.Body.pipe(res);
+  const url = await Storage.get(`${id}/${fileName}`);
+  if (process.env.NODE_ENV === 'development') {
+    return res.status(200).json({ location: url.replace('minio', 'localhost') });
+  }
+  return res.status(200).json({ location: url });
 }
