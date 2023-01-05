@@ -83,6 +83,9 @@
 .sort-title {
   position: relative;
   BUTTON {
+    &:hover {
+      background-color: transparent !important;
+    }
     &::before {
       content: '';
       display: block;

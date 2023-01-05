@@ -97,14 +97,11 @@ export default function FileList({ data }) {
 
   const handleDownloadFile = async (folder, name) => {
     setisInAction(name);
-    const { location } = await api.get(`/folders/${folder}/files/${name}`, { Accept: '*' })
-      .then((response) => response.data);
-    return fetch(location)
-      .then((response) => { if (response.ok) { return response; } throw new Error(500); })
-      .then(async (response) => new Blob([await response.blob()], { type: response.headers.get('content-type') }))
-      .then((fileBlob) => {
+    return api.get(`/folders/${folder}/files/${name}`)
+      .then((response) => response.data)
+      .then(({ location }) => {
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(fileBlob);
+        link.href = location;
         link.setAttribute('download', name);
         document.body.appendChild(link);
         link.click();
