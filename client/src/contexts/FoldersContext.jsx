@@ -9,7 +9,7 @@ const Ctx = createContext();
 export function FoldersProvider({ children }) {
   const { data, isLoading, error, reload } = useFetch('/folders');
   const Folders = useMemo(() => ({
-    findById: (id) => data.find((folder) => folder._id === id),
+    findById: (id) => data?.find((folder) => folder._id === id),
     getAll: () => data,
     reload,
   }), [data, reload]);

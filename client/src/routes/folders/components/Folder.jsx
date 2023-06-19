@@ -17,6 +17,7 @@ export default function Folder() {
   const { id } = useParams();
   const folders = useFolders();
   const currentFolder = folders.findById(id);
+  if (!currentFolder) return null;
   const [settingsView, setSettingsView] = useState(false);
   const { data, isLoading, error, reload } = useFetch(`/folders/${id}/files`);
   if (isLoading) return <PageSpinner />;
