@@ -23,7 +23,7 @@ export default function UsersLayout() {
         )}
         {id && (
           <BreadcrumbItem>
-            {users.findById(id)?.email}
+            {users?.findById(id)?.email}
           </BreadcrumbItem>
         )}
       </Breadcrumb>

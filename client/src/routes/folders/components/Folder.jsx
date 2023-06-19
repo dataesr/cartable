@@ -16,6 +16,7 @@ export default function Folder() {
   const { viewer } = useAuth();
   const { id } = useParams();
   const folders = useFolders();
+  console.log(folders);
   const currentFolder = folders?.findById(id);
   if (!currentFolder) return null;
   const [settingsView, setSettingsView] = useState(false);
