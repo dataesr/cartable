@@ -97,7 +97,7 @@ export default function FolderSettings() {
               {new Date(folder.createdAt)
                 .toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
               {' par '}
-              {usersCtx.findById(folder.createdBy)?.email}
+              {usersCtx?.findById(folder.createdBy)?.email}
             </i>
           </Text>
         </Col>
@@ -162,7 +162,7 @@ export default function FolderSettings() {
                       <Row alignItems="middle">
                         <Col n="8">
                           <Text className="fr-mb-0">
-                            {usersCtx.findById(permission.userId).email}
+                            {usersCtx?.findById(permission.userId)?.email}
                           </Text>
                         </Col>
                         <Col n="3">
