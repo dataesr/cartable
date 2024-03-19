@@ -73,27 +73,27 @@ export default function FileList({ data }) {
 
   const reducer = (state, action) => {
     switch (action.type) {
-    case 'name':
-      if (state.field === 'name') {
-        return { ...state, ascending: !state.ascending };
-      }
-      return { field: 'name', ascending: true, sorter: sorters.name };
-    case 'updatedAt':
-      if (state.field === 'updatedAt') {
-        return { ...state, ascending: !state.ascending };
-      }
-      return { field: 'updatedAt', ascending: true, sorter: sorters.updatedAt };
-    case 'size':
-      if (state.field === 'size') {
-        return { ...state, ascending: !state.ascending };
-      }
-      return { field: 'size', ascending: true, sorter: sorters.size };
-    default:
-      return state;
+      case 'name':
+        if (state.field === 'name') {
+          return { ...state, ascending: !state.ascending };
+        }
+        return { field: 'name', ascending: true, sorter: sorters.name };
+      case 'updatedAt':
+        if (state.field === 'updatedAt') {
+          return { ...state, ascending: !state.ascending };
+        }
+        return { field: 'updatedAt', ascending: true, sorter: sorters.updatedAt };
+      case 'size':
+        if (state.field === 'size') {
+          return { ...state, ascending: !state.ascending };
+        }
+        return { field: 'size', ascending: true, sorter: sorters.size };
+      default:
+        return state;
     }
   };
 
-  const [sort, setSort] = useReducer(reducer, { field: 'name', sorter: sorters.name, ascending: true });
+  const [sort, setSort] = useReducer(reducer, { field: 'updatedAt', sorter: sorters.updatedAt, ascending: false });
 
   const handleDownloadFile = async (folder, name) => {
     setisInAction(name);
