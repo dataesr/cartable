@@ -6,14 +6,14 @@ info:
     email: frederic.olland@enseignementsup.gouv.fr
   license:
     name: MIT
-    url: 'https://github.com/dataesr/cartable/LICENCE'
+    url: "https://github.com/dataesr/cartable/LICENCE"
   version: 1.0.0
 servers:
-  - url: 'https://cartable.staging.dataesr.ovh/api'
+  - url: "https://cartable.staging.dataesr.ovh/api"
     description: Staging server
-  - url: 'https://cartable.dataesr.ovh/api'
+  - url: "https://cartable.dataesr.ovh/api"
     description: Production server
-  - url: 'http://localhost:4000/api'
+  - url: "http://localhost:4000/api"
     description: Development server
 
 tags:
@@ -31,7 +31,7 @@ paths:
   # '/signup':
   #   $ref: ./paths/auth/signup.yml
 
-  '/signin':
+  "/signin":
     post:
       tags:
         - Authentication
@@ -43,21 +43,21 @@ paths:
       security: []
       operationId: signin
       parameters:
-        - $ref: '#/components/parameters/XOtp'
-        - $ref: '#/components/parameters/XOtpMethod'
+        - $ref: "#/components/parameters/XOtp"
+        - $ref: "#/components/parameters/XOtpMethod"
       requestBody:
         description: Required user credentials for signing in.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserSignInPayload'
+              $ref: "#/components/schemas/UserSignInPayload"
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tokens'
+                $ref: "#/components/schemas/Tokens"
         202:
           description: An email with an OTP has been sent.
           content:
@@ -68,14 +68,13 @@ paths:
                   message:
                     type: string
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-
-  '/signout':
+  "/signout":
     post:
       tags:
         - Authentication
@@ -93,11 +92,11 @@ paths:
                   message:
                     type: string
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/token':
+  "/token":
     post:
       tags:
         - Authentication
@@ -125,15 +124,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tokens'
+                $ref: "#/components/schemas/Tokens"
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         500:
-          $ref: '#/components/responses/ServerError'
-    
-  '/passwordless':
+          $ref: "#/components/responses/ServerError"
+
+  "/passwordless":
     post:
       tags:
         - Authentication
@@ -143,7 +142,7 @@ paths:
       security: []
       operationId: passwordless
       parameters:
-        - $ref: '#/components/parameters/XOtp'
+        - $ref: "#/components/parameters/XOtp"
       requestBody:
         content:
           application/json:
@@ -156,7 +155,7 @@ paths:
                   type: string
                 password:
                   type: string
-                  pattern: '^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&:_])[A-Za-z\d@$!%*#?&:_]{8,}$'
+                  pattern: '^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&:_.])[A-Za-z\d@$!%*#?&:_.]{8,}$'
                 firstName:
                   type: string
                 lastName:
@@ -181,15 +180,14 @@ paths:
                   message:
                     type: string
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/ServerError'
-
+          $ref: "#/components/responses/ServerError"
 
   ### USERS ###
-  '/users':
+  "/users":
     get:
       tags:
         - Users
@@ -202,14 +200,14 @@ paths:
             application/json:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/User'
+                items:
+                  $ref: "#/components/schemas/User"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
     post:
       tags:
         - Users
@@ -238,13 +236,13 @@ paths:
                   message:
                     type: string
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/users/{id}':
+  "/users/{id}":
     delete:
       tags:
         - Users
@@ -261,11 +259,11 @@ paths:
         204:
           description: No content
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
     patch:
       tags:
         - Users
@@ -295,13 +293,13 @@ paths:
         204:
           description: No content
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/folders':
+  "/folders":
     get:
       tags:
         - Folders
@@ -315,14 +313,14 @@ paths:
             application/json:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Folder'
+                items:
+                  $ref: "#/components/schemas/Folder"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
     post:
       tags:
         - Folders
@@ -355,15 +353,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Folder'
+                $ref: "#/components/schemas/Folder"
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/folders/{id}':
+  "/folders/{id}":
     patch:
       tags:
         - Folders
@@ -392,22 +390,22 @@ paths:
                     - public
                 isArchived:
                   type: boolean
-              
+
       responses:
         204:
           description: No content
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/folders/{id}/star':
+  "/folders/{id}/star":
     put:
       tags:
         - Folders
@@ -418,16 +416,16 @@ paths:
           required: true
           schema:
             type: string
-            format: mongo-objectid          
+            format: mongo-objectid
       responses:
         204:
           description: No content
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
     delete:
       tags:
         - Folders
@@ -438,18 +436,18 @@ paths:
           required: true
           schema:
             type: string
-            format: mongo-objectid          
+            format: mongo-objectid
       responses:
         204:
           description: No content
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/folders/{id}/files':
+  "/folders/{id}/files":
     post:
       tags:
         - Files
@@ -471,7 +469,7 @@ paths:
                 files:
                   type: string
                   format: binary
-              
+
       responses:
         201:
           description: Ok
@@ -480,17 +478,17 @@ paths:
               schema:
                 type: object
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/folders/{id}/permissions':
+  "/folders/{id}/permissions":
     get:
       tags:
         - Folders
@@ -501,7 +499,7 @@ paths:
           required: true
           schema:
             type: string
-            format: mongo-objectid              
+            format: mongo-objectid
       responses:
         200:
           description: OK
@@ -510,15 +508,15 @@ paths:
               schema:
                 type: array
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
     put:
       tags:
         - Folders
@@ -539,26 +537,26 @@ paths:
               properties:
                 role:
                   type: string
-                  default: viewer 
+                  default: viewer
                 userId:
                   type: string
                   format: mongo-objectid
-                    
+
       responses:
         204:
           description: No content
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/folders/{folderId}/permissions/{userId}':
+  "/folders/{folderId}/permissions/{userId}":
     delete:
       tags:
         - Permissions
@@ -580,17 +578,17 @@ paths:
         204:
           description: No content
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         404:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/folders/{id}/files/{filename}':
+  "/folders/{id}/files/{filename}":
     get:
       tags:
         - Files
@@ -605,7 +603,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string              
+            type: string
       responses:
         200:
           description: Ok
@@ -614,15 +612,15 @@ paths:
               schema:
                 type: object
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
     delete:
       tags:
         - Files
@@ -637,20 +635,20 @@ paths:
           in: path
           required: true
           schema:
-            type: string              
+            type: string
       responses:
         204:
           description: No content
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         403:
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/me':
+  "/me":
     get:
       tags:
         - Users
@@ -662,11 +660,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Me'
+                $ref: "#/components/schemas/Me"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
     patch:
       tags:
         - Users
@@ -688,15 +686,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Me'
+                $ref: "#/components/schemas/Me"
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         500:
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
-  '/me/password':
+  "/me/password":
     put:
       tags:
         - Users
@@ -723,14 +721,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Me'
+                $ref: "#/components/schemas/Me"
         400:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         500:
-          $ref: '#/components/responses/ServerError'
-
+          $ref: "#/components/responses/ServerError"
 
 components:
   parameters:
@@ -746,7 +743,7 @@ components:
       description: Use X-Cartable-OTP header to provide user's OTP
       schema:
         type: string
-        pattern: '^[0-9]{6}$'
+        pattern: "^[0-9]{6}$"
     XOtpMethod:
       name: X-Cartable-OTP-Method
       in: header
@@ -756,9 +753,9 @@ components:
       schema:
         type: string
         enum:
-          - 'email'
-          - 'authenticator'
-          - 'recovery'
+          - "email"
+          - "authenticator"
+          - "recovery"
 
   responses:
     BadRequest:
@@ -766,31 +763,31 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     Forbidden:
       description: Permission denied.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     NotFound:
       description: Not found.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     ServerError:
       description: Server error.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     Unauthorized:
       description: Authentication needed.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
 
   schemas:
     Error:
@@ -811,7 +808,7 @@ components:
                 type: string
               errorCode:
                 type: string
-    
+
     Me:
       type: object
       additionalProperties: false
